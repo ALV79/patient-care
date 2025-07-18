@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Doctor } from '@prisma/client'
+import { RepeatIcon, UserPlus2Icon } from 'lucide-react'
 import { useAction } from 'next-safe-action/hooks'
 import { useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
@@ -84,20 +86,24 @@ const formSchema = z
   )
 
 interface UpsertDoctorFormProps {
+  doctor?: Doctor
   onSuccess?: () => void
 }
 
-const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({ onSuccess, doctor }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
+    shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      specialty: '',
-      appointmentPrice: 0,
-      availableFromWeekDay: '1',
-      availableToWeekDay: '5',
-      availableFromTime: '',
-      availableToTime: '',
+      name: doctor?.name ?? '',
+      specialty: doctor?.specialty ?? '',
+      appointmentPrice: doctor?.appointmentPriceInCents
+        ? doctor.appointmentPriceInCents / 100
+        : 0,
+      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? '1',
+      availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? '5',
+      availableFromTime: doctor?.availableFromTime ?? '08:00:00',
+      availableToTime: doctor?.availableToTime ?? '18:00:00',
     },
   })
 
@@ -134,6 +140,7 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     upsertDoctorAction.execute({
       ...values,
+      id: doctor?.id,
       availableFromWeekDay: parseInt(values.availableFromWeekDay),
       availableToWeekDay: parseInt(values.availableToWeekDay),
       appointmentPriceInCents: values.appointmentPrice * 100,
@@ -143,8 +150,12 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Adicione médico</DialogTitle>
-        <DialogDescription>Adicione um novo médico</DialogDescription>
+        <DialogTitle>{doctor ? doctor.name : 'Adicione médico'}</DialogTitle>
+        <DialogDescription>
+          {doctor
+            ? 'Atualizar informções do médico'
+            : 'Adicionar um novo médico'}
+        </DialogDescription>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -342,7 +353,12 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
               type="submit"
               disabled={upsertDoctorAction.isPending}
             >
-              {upsertDoctorAction.isPending ? 'Salvando...' : 'Adicionar'}
+              {doctor ? <RepeatIcon /> : <UserPlus2Icon />}
+              {upsertDoctorAction.isPending
+                ? 'Salvando...'
+                : doctor
+                  ? 'Atualizar'
+                  : 'Adicionar'}
             </Button>
           </DialogFooter>
         </form>
