@@ -1,4 +1,6 @@
 'use server'
+import { revalidatePath } from 'next/cache'
+
 import prisma from '@/lib/prisma'
 import { actionClient } from '@/lib/safe-action'
 
@@ -15,13 +17,13 @@ export const upsertPatient = actionClient
         where: { id: _id },
         data: dataWithoutId,
       })
-
+      revalidatePath('/patients')
       return { patient }
     }
 
     const patient = await prisma.patient.create({
       data: { ...parsedInput },
     })
-
+    revalidatePath('/patients')
     return { patient }
   })

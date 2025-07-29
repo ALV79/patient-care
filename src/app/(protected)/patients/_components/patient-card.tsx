@@ -114,7 +114,6 @@ export function PatientCard({ patient, clinicID }: Props) {
               clinicID={clinicID}
               onSuccess={() => {
                 setIsOpen(false)
-                router.refresh()
               }}
             />
           </DialogContent>
@@ -126,15 +125,15 @@ export function PatientCard({ patient, clinicID }: Props) {
               disabled={isPending}
               className="text-destructive border-destructive w-full hover:bg-red-100 hover:text-red-800"
             >
-              Excluir
+              Excluir paciente
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
               <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-                paciente <strong>{patient.name}</strong> e todas as suas
+                Esta ação não poderá ser desfeita. Isso excluirá permanentemente
+                o paciente <strong>{patient.name}</strong> e todas as suas
                 informações.
               </AlertDialogDescription>
             </AlertDialogHeader>

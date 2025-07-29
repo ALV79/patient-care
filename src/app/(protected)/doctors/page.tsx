@@ -14,7 +14,7 @@ import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
 import AddDoctorButton from './_components/add-doctor-button'
-import DoctorCard from './_components/doctor-card'
+import { DoctorCard } from './_components/doctor-card'
 
 const DoctorsPage = async () => {
   const session = await auth.api.getSession({

@@ -1,6 +1,7 @@
 'use client'
 import { Doctor } from '@prisma/client'
 import { CalendarIcon, ClockIcon, DollarSign, TrashIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useAction } from 'next-safe-action/hooks'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -32,22 +33,19 @@ interface DoctorCardProps {
   doctor: Doctor
 }
 
-const DoctorCard = ({ doctor }: DoctorCardProps) => {
+export function DoctorCard({ doctor }: DoctorCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const router = useRouter()
 
-  const deleteDoctorAction = useAction(deleteDoctor, {
+  const { execute: executeDelete, isPending } = useAction(deleteDoctor, {
     onSuccess: () => {
       toast.success('Médico adicionado com sucesso!')
+      router.refresh()
     },
     onError: () => {
       toast.error('Erro ao adicionar médico!')
     },
   })
-
-  const handleDeleteDoctor = () => {
-    if (!doctor) return
-    deleteDoctorAction.execute({ id: doctor.id })
-  }
 
   const doctorInitials = doctor.name
     .split(' ')
@@ -113,19 +111,21 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
+              <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
               <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-                médico e removerá seus dados de nossos servidores.
+                Esta ação não poderá ser desfeita. Isso excluirá permanentemente
+                o médico <strong>{doctor.name}</strong> e todas as suas
+                informações.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
               <AlertDialogAction
-                onClick={handleDeleteDoctor}
+                onClick={() => executeDelete({ id: doctor.id })}
+                disabled={isPending}
                 className="bg-destructive hover:bg-red-800 hover:text-red-200"
               >
-                Excluir
+                {isPending ? 'Excluindo...' : 'Excluir'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -134,5 +134,3 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
     </Card>
   )
 }
-
-export default DoctorCard

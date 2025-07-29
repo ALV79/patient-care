@@ -148,7 +148,7 @@ export function UpsertPatientForm({
         />
 
         <Button type="submit" disabled={isPending} className="w-full">
-          {defaultValues?.id ? 'Salvando' : 'Salvar'} paciente
+          {defaultValues?.id ? 'Alterar' : 'Salvar'} paciente
         </Button>
       </form>
     </Form>

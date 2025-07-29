@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -20,7 +19,6 @@ interface Props {
 
 export function AddPatientButton({ clinicID }: Props) {
   const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -35,7 +33,6 @@ export function AddPatientButton({ clinicID }: Props) {
           clinicID={clinicID}
           onSuccess={() => {
             setIsOpen(false)
-            router.refresh()
           }}
         />
       </DialogContent>

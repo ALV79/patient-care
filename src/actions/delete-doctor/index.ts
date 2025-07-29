@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 
@@ -32,5 +31,5 @@ export const deleteDoctor = actionClient
         },
       })
     }
-    revalidatePath('/doctors')
+    return { success: true }
   })
