@@ -59,7 +59,9 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Avatar className="h-12 w-12">
-            <AvatarFallback>{doctorInitials}</AvatarFallback>
+            <AvatarFallback className="bg-gray-200 text-gray-600">
+              {doctorInitials}
+            </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="text-sm font-medium">{doctor.name}</h3>
@@ -96,6 +98,7 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
               availableToTime: availability.to.format('HH:mm:ss'),
             }}
             onSuccess={() => setDialogOpen(false)}
+            isOpen={dialogOpen}
           />
         </Dialog>
         <AlertDialog>

@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Doctor } from '@prisma/client'
 import { RepeatIcon, UserPlus2Icon } from 'lucide-react'
 import { useAction } from 'next-safe-action/hooks'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 import { toast } from 'sonner'
@@ -86,11 +87,16 @@ const formSchema = z
   )
 
 interface UpsertDoctorFormProps {
+  isOpen?: boolean
   doctor?: Doctor
   onSuccess?: () => void
 }
 
-const UpsertDoctorForm = ({ onSuccess, doctor }: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({
+  isOpen,
+  doctor,
+  onSuccess,
+}: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     shouldUnregister: true,
     resolver: zodResolver(formSchema),
@@ -106,6 +112,22 @@ const UpsertDoctorForm = ({ onSuccess, doctor }: UpsertDoctorFormProps) => {
       availableToTime: doctor?.availableToTime ?? '18:00:00',
     },
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        name: doctor?.name ?? '',
+        specialty: doctor?.specialty ?? '',
+        appointmentPrice: doctor?.appointmentPriceInCents
+          ? doctor.appointmentPriceInCents / 100
+          : 0,
+        availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? '1',
+        availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? '5',
+        availableFromTime: doctor?.availableFromTime ?? '08:00:00',
+        availableToTime: doctor?.availableToTime ?? '18:00:00',
+      })
+    }
+  }, [isOpen, doctor, form])
 
   const timeOptions = generateTimeOptions()
   const grouped = timeOptions.reduce(
