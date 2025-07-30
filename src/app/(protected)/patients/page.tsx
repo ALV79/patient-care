@@ -1,37 +1,39 @@
 import { Suspense } from 'react'
 
+import { DataTable } from '@/components/ui/data-table'
 import { PageContainer } from '@/components/ui/page-container'
 import prisma from '@/lib/prisma'
 
 import { AddPatientButton } from './_components/add-patient-button'
-import { PatientCard } from './_components/patient-card'
+// import { PatientCard } from './_components/patient-card'
+import { patientsTableColumns } from './_components/table-columns'
 
-async function PatientList({ clinicID }: { clinicID: string }) {
-  const patients = await prisma.patient.findMany({
-    where: {
-      clinicID,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
+// async function PatientList({ clinicID }: { clinicID: string }) {
+//   const patients = await prisma.patient.findMany({
+//     where: {
+//       clinicID,
+//     },
+//     orderBy: {
+//       createdAt: 'desc',
+//     },
+//   })
 
-  if (patients.length === 0) {
-    return (
-      <div className="mt-10 text-center">
-        <p className="text-muted-foreground">Nenhum paciente cadastrado.</p>
-      </div>
-    )
-  }
+//   if (patients.length === 0) {
+//     return (
+//       <div className="mt-10 text-center">
+//         <p className="text-muted-foreground">Nenhum paciente cadastrado.</p>
+//       </div>
+//     )
+//   }
 
-  return (
-    <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {patients.map((patient) => (
-        <PatientCard key={patient.id} patient={patient} clinicID={clinicID} />
-      ))}
-    </div>
-  )
-}
+//   return (
+//     <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+//       {patients.map((patient) => (
+//         <PatientCard key={patient.id} patient={patient} clinicID={clinicID} />
+//       ))}
+//     </div>
+//   )
+// }
 
 export default async function PatientsPage() {
   const clinic = await prisma.clinic.findFirst()
@@ -39,6 +41,15 @@ export default async function PatientsPage() {
   if (!clinic) {
     return null
   }
+
+  const patients = await prisma.patient.findMany({
+    where: {
+      clinicID: clinic.id,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
 
   return (
     <PageContainer>
@@ -59,7 +70,8 @@ export default async function PatientsPage() {
           </div>
         }
       >
-        <PatientList clinicID={clinic.id} />
+        <DataTable data={patients} columns={patientsTableColumns} />
+        {/* <PatientList clinicID={clinic.id} /> */}
       </Suspense>
     </PageContainer>
   )
